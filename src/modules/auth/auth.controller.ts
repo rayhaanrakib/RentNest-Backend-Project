@@ -51,7 +51,7 @@ const refreshToken = tryCatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies.refreshToken;
     const { accessToken } = await authService.refreshToken(refreshToken);
-   //  set latest accessToken cookie
+
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: false,
@@ -68,8 +68,9 @@ const refreshToken = tryCatchAsync(
 );
 
 
+
 export const authController = {
   registerUser,
   loginUser,
-  refreshToken
+  refreshToken,
 };

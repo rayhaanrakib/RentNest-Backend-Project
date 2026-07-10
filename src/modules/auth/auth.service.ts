@@ -7,7 +7,6 @@ import AppError from "../../utils/AppError";
 import httpStatus from "http-status";
 import { jwtUtils } from "../../utils/jwt";
 import { JwtPayload, SignOptions } from "jsonwebtoken";
-import { User } from "../../../generated/prisma/client";
 
 const registerUserDB = async (payload: IRegisterUser) => {
   const { name, email, password, role, phone, avatar } = payload;
@@ -175,6 +174,7 @@ const loginUserDB = async (payload: ILoginUser) => {
     refreshToken,
   };
 };
+
 
 const refreshToken = async (refreshToken: string) => {
   const verifiedRefreshToken = jwtUtils.verifyToken(

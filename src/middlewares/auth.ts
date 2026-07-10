@@ -55,7 +55,7 @@ export const auth = (...requiredRoles: UserRole[]) => {
         throw new AppError(
           httpStatus.FORBIDDEN,
           "Forbidden",
-          "Forbidden. You don't have permission to access this resource.",
+          "You don't have permission to access this resource.",
         );
       }
       const user = await prisma.user.findUnique({
@@ -70,7 +70,7 @@ export const auth = (...requiredRoles: UserRole[]) => {
         throw new AppError(
           httpStatus.UNAUTHORIZED,
           "Unauthorized",
-          ", Please log in again",
+          "Session expired, Please log in again",
         );
       }
       if (user.status === "INACTIVE") {

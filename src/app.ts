@@ -51,7 +51,7 @@ app.get("/", (req: Request, res: Response) => {
 
 // API Routes
 app.use("/api/auth", authRouter);
-// app.use("/api/user", userRouter);
+app.use("/api/user", userRouter);
 
 // middlewares
 app.use(RouteHandler);
