@@ -1,0 +1,18 @@
+model Review {
+  id          String   @id @default(uuid())
+  rating      Int      // 1 to 5
+  comment     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Foreign Keys
+  tenantId    String
+  propertyId  String
+
+  // Relations
+  tenant      User     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, propertyId]) // One review per tenant per property
+  @@map("reviews")
+}

@@ -1,0 +1,20 @@
+model RentalRequest {
+  id           String       @id @default(uuid())
+  moveInDate   DateTime
+  duration     Int          // Duration in months
+  message      String?      // Optional message to landlord
+  status       RentalStatus @default(PENDING)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  // Foreign Keys
+  tenantId     String
+  propertyId   String
+
+  // Relations
+  tenant       User         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property     Property     @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  payment      Payment?     // One rental can have one payment
+
+  @@map("rental_requests")
+}
