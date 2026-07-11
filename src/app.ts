@@ -9,6 +9,7 @@ import { authRouter } from "./modules/auth/auth.route";
 import { propertyRouter } from "./modules/property/property.route";
 import { categoryRouter } from "./modules/category/category.route";
 import { adminRouter } from "./modules/admin/admin.route";
+import { rentalRouter } from "./modules/rental/rental.route";
 
 const app: Application = express();
 
@@ -58,6 +59,7 @@ app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/properties", propertyRouter);
+app.use("/api/rentals", rentalRouter);
 
 // middlewares
 app.use(RouteHandler);
