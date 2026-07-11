@@ -18,20 +18,20 @@ router.get(
 );
 
 // Landlord Routes
-// router.get(
-//   "/landlord/requests/all",
-//   auth(UserRole.LANDLORD),
-//   rentalController.getLandlordAllRequests,
-// );
-// router.get(
-//   "/landlord/requests/:id",
-//   auth(UserRole.LANDLORD),
-//   rentalController.getLandlordRequestsDetail,
-// );
-// router.patch(
-//   "/landlord/requests/:id",
-//   auth(UserRole.LANDLORD),
-//   rentalController.updateLandlordRequestStatus,
-// );
+router.get(
+  "/landlord/requests/all",
+  auth(UserRole.LANDLORD),
+  rentalController.getLandlordAllRequests,
+);
+router.get(
+  "/landlord/requests/:id",
+  auth(UserRole.LANDLORD),
+  rentalController.getLandlordRequestsDetail,
+);
+router.patch(
+  "/landlord/requests/:id",
+  auth(UserRole.LANDLORD),
+  rentalController.updateLandlordRequestStatus,
+);
 
 export const rentalRouter = router;
