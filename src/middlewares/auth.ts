@@ -55,7 +55,9 @@ export const auth = (...requiredRoles: UserRole[]) => {
         throw new AppError(
           httpStatus.FORBIDDEN,
           "Forbidden",
-          "You don't have permission to access this resource.",
+          `Access denied. Required role: ${requiredRoles.join(
+            ", ",
+          )}. Your role: ${role}`,
         );
       }
       const user = await prisma.user.findUnique({
@@ -77,7 +79,7 @@ export const auth = (...requiredRoles: UserRole[]) => {
         throw new AppError(
           httpStatus.UNAUTHORIZED,
           "Unauthorized",
-          "User is inactive, Please contact support",
+          "This account is inactive, Please contact support",
         );
       }
 
