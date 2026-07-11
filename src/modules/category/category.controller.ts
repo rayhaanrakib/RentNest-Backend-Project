@@ -18,9 +18,8 @@ const getAllCategories = tryCatchAsync(
 );
 const createCategory = tryCatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user?.id as string;
     const payload = req.body as ICreateCategoryPayload;
-    const category = await categoryService.createCategoryDB(payload, userId);
+    const category = await categoryService.createCategoryDB(payload);
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,
@@ -46,7 +45,17 @@ const deleteCategory = tryCatchAsync(
 const getSpecificCategoryProperties = tryCatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const categoryId = req.params.id as string;
-    const {properties, categoryName, propertiesCount} = await categoryService.getSpecificCategoryPropertiesDB(categoryId);
+    const { properties, categoryName, propertiesCount } =
+      await categoryService.getSpecificCategoryPropertiesDB(categoryId);
+    if (propertiesCount === 0) {
+      const message = `Category ${categoryName} does not have any properties.`;
+      sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: `Successfully retrieved ${propertiesCount} properties from the ${categoryName} category`,
+        data: message,
+      });
+    }
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
@@ -56,11 +65,9 @@ const getSpecificCategoryProperties = tryCatchAsync(
   },
 );
 
-
-
 export const categoryController = {
   getAllCategories,
   getSpecificCategoryProperties,
   createCategory,
-  deleteCategory
+  deleteCategory,
 };

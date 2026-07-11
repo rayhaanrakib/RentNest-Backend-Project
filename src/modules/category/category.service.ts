@@ -1,3 +1,4 @@
+import { PropertyStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import { ICreateCategoryPayload } from "./category.interface";
@@ -21,14 +22,8 @@ const getAllCategoriesDB = async () => {
 };
 
 const createCategoryDB = async (
-  payload: ICreateCategoryPayload,
-  userId: string,
+  payload: ICreateCategoryPayload
 ) => {
-  const user = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: userId,
-    },
-  });
   const categoryName = payload.name;
   const categoryNameExist = await prisma.category.findUnique({
     where: {
@@ -97,11 +92,13 @@ const getSpecificCategoryPropertiesDB = async (categoryId: string) => {
   const propertiesCount = await prisma.property.count({
     where: {
       categoryId: categoryId,
+      status: PropertyStatus.AVAILABLE,
     },
   });
   const properties = await prisma.property.findMany({
     where: {
       categoryId: categoryId,
+      status: PropertyStatus.AVAILABLE,
     },
     orderBy: {
       createdAt: "desc",
@@ -125,7 +122,7 @@ const getSpecificCategoryPropertiesDB = async (categoryId: string) => {
     },
   });
 
-  return {properties,categoryName,propertiesCount};
+  return { properties, categoryName, propertiesCount };
 };
 
 export const categoryService = {
