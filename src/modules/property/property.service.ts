@@ -4,6 +4,7 @@ import {
   ICreatePropertyPayload,
   IPropertyListQuery,
   IUpdatePropertyPayload,
+  IUpdatePropertyStatusPayload,
 } from "./property.interface";
 import httpStatus from "http-status-codes";
 import {
@@ -17,7 +18,9 @@ import {
 import {
   validateCreateProperty,
   validateUpdateProperty,
+  validateUpdatePropertyStatus,
 } from "./property.validation";
+import { PropertyStatus } from "../../../generated/prisma/enums";
 
 const createPropertyDB = async (
   payload: ICreatePropertyPayload,
@@ -52,45 +55,60 @@ const createPropertyDB = async (
   return property;
 };
 const getPropertyListDB = async (query: IPropertyListQuery) => {
-  console.log("Received query:", query);
+  //   console.log("query:", query);
   const page = Number(query.page) || 1;
   const limit = Number(query.limit) || 10;
   const skip = (page - 1) * limit;
 
   const where = BUILD_PROPERTY_CLAUSE(query);
   const orderBy = BUILD_PROPERTY_ORDER_BY_CLAUSE(query);
-  const total = await prisma.property.count({
+  const total_property = await prisma.property.count({
     where,
   });
+  const available_property = await prisma.property.count({
+    where: {
+      ...where,
+      status: PropertyStatus.AVAILABLE,
+    },
+  });
+  const rented_property = await prisma.property.count({
+    where: {
+      ...where,
+      status: PropertyStatus.RENTED,
+    },
+  });
+
   const result = await prisma.property.findMany({
-    select: ALL_PROPERTY_SELECT,
     where,
     orderBy,
     skip,
     take: limit,
+    select: ALL_PROPERTY_SELECT,
   });
   return {
     meta: {
       page,
       limit,
-      total,
-      totalPage: Math.ceil(total / limit),
+      totalPage: Math.ceil(total_property / limit),
+      total_property,
+      available_property,
+      rented_property,
     },
     properties: result,
   };
 };
 
 const getPropertyDetailDB = async (propertyId: string) => {
-   const propertyExist = await prisma.property.findUnique({
+  const propertyExist = await prisma.property.findUnique({
     where: {
       id: propertyId,
     },
-   });
-   if (!propertyExist) {
+  });
+  if (!propertyExist) {
     throw new AppError(
       httpStatus.NOT_FOUND,
       "Not Found",
-      `Property with ID ${propertyId} not found.`,
+      `No property found with ID ${propertyId}`,
     );
   }
   const property = await prisma.property.findUnique({
@@ -102,6 +120,93 @@ const getPropertyDetailDB = async (propertyId: string) => {
   return property;
 };
 
+const getMyPropertyListDB = async (userId: string) => {
+  const total_property = await prisma.property.count({
+    where: {
+      landlordId: userId,
+    },
+  });
+  const available_property = await prisma.property.count({
+    where: {
+      landlordId: userId,
+      status: PropertyStatus.AVAILABLE,
+    },
+  });
+  const rented_property = await prisma.property.count({
+    where: {
+      landlordId: userId,
+      status: PropertyStatus.RENTED,
+    },
+  });
+  const unavailable_property = await prisma.property.count({
+    where: {
+      landlordId: userId,
+      status: PropertyStatus.UNAVAILABLE,
+    },
+  });
+
+  const propertyOwners = await prisma.property.findMany({
+    where: {
+      landlordId: userId,
+    },
+  });
+  if (propertyOwners.length === 0) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Not Found",
+      "No properties found",
+    );
+  }
+  const result = await prisma.property.findMany({
+    where: {
+      landlordId: userId,
+    },
+    select: SPECIFIC_PROPERTY_SELECT,
+  });
+  return {
+    meta: {
+      total_property,
+      available_property,
+      rented_property,
+      unavailable_property,
+    },
+    properties: result,
+  };
+};
+const updatePropertyStatusDB = async (propertyId: string, userId: string, payload: IUpdatePropertyStatusPayload) =>{
+    validateUpdatePropertyStatus({
+      ...payload,
+    });
+    const propertyExist = await prisma.property.findUnique({
+      where: {
+        id: propertyId,
+      },
+    });
+    if (!propertyExist) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Bad Request",
+        "Property does not exist.",
+      );
+    }
+    if (propertyExist.landlordId !== userId) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "Forbidden",
+        "You can only update your own properties",
+      );
+    }
+    const property = await prisma.property.update({
+      where: {
+        id: propertyId,
+      },
+      data: {
+        status: payload.status,
+      },
+      select: UPDATE_PROPERTY_SELECT,
+    });
+    return property;
+}
 const updatePropertyDB = async (
   propertyId: string,
   userId: string,
@@ -172,7 +277,9 @@ const deletePropertyDB = async (propertyId: string, userId: string) => {
 export const propertyService = {
   getPropertyListDB,
   getPropertyDetailDB,
+  getMyPropertyListDB,
   createPropertyDB,
   updatePropertyDB,
+  updatePropertyStatusDB,
   deletePropertyDB,
 };

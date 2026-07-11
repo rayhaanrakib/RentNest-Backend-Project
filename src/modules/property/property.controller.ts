@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { tryCatchAsync } from "../../utils/tryCatchAsync";
-import { ICreatePropertyPayload, IUpdatePropertyPayload } from "./property.interface";
+import { ICreatePropertyPayload, IUpdatePropertyPayload, IUpdatePropertyStatusPayload } from "./property.interface";
 import { propertyService } from "./property.service";
 import httpStatus from "http-status-codes";
 import { sendResponse } from "../../utils/sendResponse";
@@ -47,7 +47,34 @@ const getPropertyDetail = tryCatchAsync(
     });
   },
 );
-
+const getMyPropertyList = tryCatchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id as string;
+    const properties = await propertyService.getMyPropertyListDB(userId);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "My properties retrieved successfully",
+      data: properties,
+    });
+  },
+);
+const updatePropertyStatus = tryCatchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.user?.id as string;
+  const propertyId = req.params.id as string;
+  const payload = req.body as IUpdatePropertyStatusPayload;
+  const property = await propertyService.updatePropertyStatusDB(
+    propertyId,
+    userId,
+    payload,
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.ACCEPTED,
+    message: "Property status updated successfully",
+    data: property,
+  });
+});
 const updateProperty = tryCatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id as string;
@@ -86,7 +113,9 @@ const deleteProperty = tryCatchAsync(
 export const propertyController = {
   getPropertyList,
   getPropertyDetail,
+  getMyPropertyList,
   createProperty,
   updateProperty,
+  updatePropertyStatus,
   deleteProperty,
 };

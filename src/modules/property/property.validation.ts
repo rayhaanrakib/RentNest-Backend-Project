@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import {
   ICreatePropertyPayload,
   IUpdatePropertyPayload,
+  IUpdatePropertyStatusPayload,
 } from "./property.interface";
 import AppError from "../../utils/AppError";
 import { PropertyStatus } from "../../../generated/prisma/enums";
@@ -147,6 +148,18 @@ export const validateUpdateProperty = (
       httpStatus.BAD_REQUEST,
       "Validation failed",
       "Invalid property status",
+    );
+  }
+};
+
+export const validateUpdatePropertyStatus = (
+  payload: IUpdatePropertyStatusPayload,
+): void => {
+  if (!payload.status) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Validation failed",
+      "Property status is required",
     );
   }
 };

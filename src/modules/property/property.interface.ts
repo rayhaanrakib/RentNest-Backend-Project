@@ -38,6 +38,9 @@ export interface IUpdatePropertyPayload {
   status?: PropertyStatus;
   categoryId?: string;
 }
+export interface IUpdatePropertyStatusPayload{
+    status?: PropertyStatus;
+}
 
 export interface IPropertyListQuery {
   // Location

@@ -1,4 +1,4 @@
-import { Prisma } from "../../../generated/prisma/client";
+import { Prisma, PropertyStatus } from "../../../generated/prisma/client";
 import { IPropertyListQuery } from "./property.interface";
 
 // PROPERTY SELECT DATA
@@ -185,8 +185,15 @@ export const BUILD_PROPERTY_CLAUSE = (
   }
 
   // Status
-  if (query.status) {
+  if (
+    query.status === PropertyStatus.AVAILABLE ||
+    query.status === PropertyStatus.RENTED
+  ) {
     where.status = query.status;
+  } else {
+    where.status = {
+      in: [PropertyStatus.AVAILABLE, PropertyStatus.RENTED],
+    };
   }
 
   // Search
