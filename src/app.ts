@@ -8,6 +8,7 @@ import { userRouter } from "./modules/user/user.route";
 import { authRouter } from "./modules/auth/auth.route";
 import { propertyRouter } from "./modules/property/property.route";
 import { categoryRouter } from "./modules/category/category.route";
+import { adminRouter } from "./modules/admin/admin.route";
 
 const app: Application = express();
 
@@ -54,6 +55,7 @@ app.get("/", (req: Request, res: Response) => {
 // API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/admin", adminRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/properties", propertyRouter);
 
