@@ -38,8 +38,8 @@ const createPropertyDB = async (
   });
   if (!category) {
     throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Bad Request",
+      httpStatus.NOT_FOUND,
+      "Not Found",
       "Category does not exist",
     );
   }
