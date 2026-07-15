@@ -200,9 +200,62 @@ const updateUserStatusDB = async (
   return user;
 };
 
+const getStatsDB = async () => {
+  const [
+    totalUsers,
+    totalTenants,
+    totalLandlords,
+    totalProperties,
+    totalRentals,
+    totalRevenueResult,
+    pendingRequests,
+  ] = await Promise.all([
+    prisma.user.count({ where: { role: { not: "ADMIN" } } }),
+    prisma.user.count({ where: { role: "TENANT" } }),
+    prisma.user.count({ where: { role: "LANDLORD" } }),
+    prisma.property.count(),
+    prisma.rentalRequest.count(),
+    prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: { status: "COMPLETED" },
+    }),
+    prisma.rentalRequest.count({ where: { status: "PENDING" } }),
+  ]);
+
+  const totalRevenue = totalRevenueResult._sum.amount || 0;
+
+  return {
+    totalUsers,
+    totalTenants,
+    totalLandlords,
+    totalProperties,
+    totalRentals,
+    totalRevenue,
+    pendingRequests,
+  };
+};
+
+const getProfileDB = async (userId: string) => {
+  const admin = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      avatar: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  return admin;
+};
+
 export const adminService = {
-  // getProfileDB,
-  // getStatsDB,
+  getProfileDB,
+  getStatsDB,
   getAllUsersDB,
   getAllUsersByRoleDB,
   updateUserStatusDB,

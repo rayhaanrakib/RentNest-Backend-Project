@@ -46,10 +46,34 @@ const updateUserStatus = tryCatchAsync(
     });
   },
 );
+const getStats = tryCatchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const stats = await adminService.getStatsDB();
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Stats retrieved successfully",
+      data: stats,
+    });
+  },
+);
+
+const getProfile = tryCatchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id as string;
+    const profile = await adminService.getProfileDB(userId);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Profile retrieved successfully",
+      data: profile,
+    });
+  },
+);
 
 export const adminController = {
-  //   getStats,
-  //   getProfile,
+    getStats,
+    getProfile,
   getAllUsersByRole,
   getAllUsers,
   updateUserStatus,
