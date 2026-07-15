@@ -10,6 +10,7 @@ import { propertyRouter } from "./modules/property/property.route";
 import { categoryRouter } from "./modules/category/category.route";
 import { adminRouter } from "./modules/admin/admin.route";
 import { rentalRouter } from "./modules/rental/rental.route";
+import { paymentRouter } from "./modules/payment/payment.route";
 
 const app: Application = express();
 
@@ -21,6 +22,10 @@ app.use(
     credentials: true,
   }),
 );
+
+// stripe webhook
+app.use("/api/payments/webhook", express.raw({ type: 'application/json' }))
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -38,7 +43,6 @@ app.get("/", (req: Request, res: Response) => {
   res.json({
     status: "success",
     message: "RentNest is a backend API for a rental marketplace.",
-    live_server: "https://rayhaanrakib-rentnest.vercel.app",
     api_documentation:
       "https://documenter.getpostman.com/view/55143757/2sBY4LQM5J",
     database: "PostgreSQL",
@@ -60,6 +64,7 @@ app.use("/api/admin", adminRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/properties", propertyRouter);
 app.use("/api/rentals", rentalRouter);
+app.use("/api/payments", paymentRouter)
 
 // middlewares
 app.use(RouteHandler);

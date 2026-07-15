@@ -12,7 +12,7 @@
     "generate": "prisma generate",
     "build": "npm run generate && tsup",
     "dev": "tsx watch src/server.ts",
-    "stripe:webhook": "stripe listen --forward-to localhost:5000/api/subscription/webhook"
+    "stripe:webhook": "stripe listen --forward-to localhost:5000/api/payments/webhook"
   },
   "private": true,
   "devDependencies": {
