@@ -42,6 +42,7 @@ const loginUser = tryCatchAsync(
       data: {
         user,
         accessToken,
+        refreshToken
       },
     });
   },
