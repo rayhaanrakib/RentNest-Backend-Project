@@ -13,3 +13,9 @@ export interface IRegisterUser {
   phone?: string;
   avatar?: string;
 }
+
+export interface IJwtPayload {
+  id: string;
+  email: string;
+  role: UserRole;
+}

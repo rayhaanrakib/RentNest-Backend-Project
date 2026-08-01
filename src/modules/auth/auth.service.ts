@@ -2,11 +2,41 @@ import bcrypt from "bcrypt";
 import { UserRole } from "../../../generated/prisma/enums";
 import config from "../../config";
 import { prisma } from "../../lib/prisma";
-import { ILoginUser, IRegisterUser } from "./auth.interface";
+import { IJwtPayload, ILoginUser, IRegisterUser } from "./auth.interface";
 import AppError from "../../utils/AppError";
 import httpStatus from "http-status";
 import { jwtUtils } from "../../utils/jwt";
 import { JwtPayload, SignOptions } from "jsonwebtoken";
+import { User } from "../../../generated/prisma/client";
+
+const createJwtPayload = (authUser: User): IJwtPayload => ({
+  id: authUser.id,
+  email: authUser.email,
+  role: authUser.role,
+});
+const generateAuthTokens = (jwtPayload: IJwtPayload) => {
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwtAccessSecret,
+    config.jwtAccessExpiresIn as SignOptions,
+  );
+
+  const refreshToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwtRefreshSecret,
+    config.jwtRefreshExpiresIn as SignOptions,
+  );
+
+  return {
+    user: jwtPayload,
+    accessToken,
+    refreshToken,
+  };
+};
+
+const createAuthSession = (authUser: User) => {
+  return generateAuthTokens(createJwtPayload(authUser));
+};
 
 const registerUserDB = async (payload: IRegisterUser) => {
   const { name, email, password, role, phone, avatar } = payload;
@@ -108,7 +138,7 @@ const registerUserDB = async (payload: IRegisterUser) => {
     Number(config.bcryptSaltRounds),
   );
 
-  const createUser = await prisma.user.create({
+  const authUser = await prisma.user.create({
     data: {
       name: name.trim(),
       email: normalizedEmail,
@@ -118,32 +148,29 @@ const registerUserDB = async (payload: IRegisterUser) => {
       avatar,
     },
   });
-
-  return prisma.user.findUnique({
-    where: {
-      id: createUser.id,
-    },
-    omit: {
-      password: true,
-    },
-  });
+  const { accessToken, refreshToken, user } = createAuthSession(authUser);
+  return {
+    user,
+    accessToken,
+    refreshToken,
+  };
 };
 
 const loginUserDB = async (payload: ILoginUser) => {
   const { email, password } = payload;
-  const user = await prisma.user.findUnique({
+  const authUser = await prisma.user.findUnique({
     where: {
       email: email.trim().toLowerCase(),
     },
   });
-  if (!user) {
+  if (!authUser) {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
       "Unauthorized",
       "Email is not registered",
     );
   }
-  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+  const isPasswordCorrect = await bcrypt.compare(password, authUser.password);
   if (!isPasswordCorrect) {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
@@ -151,30 +178,13 @@ const loginUserDB = async (payload: ILoginUser) => {
       "Password is incorrect, Please try again",
     );
   }
-  const jwtPayload = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-  };
-  const accessToken = jwtUtils.createToken(
-    jwtPayload,
-    config.jwtAccessSecret,
-    config.jwtAccessExpiresIn as SignOptions,
-  );
-
-  const refreshToken = jwtUtils.createToken(
-    jwtPayload,
-    config.jwtRefreshSecret,
-    config.jwtRefreshExpiresIn as SignOptions,
-  );
+  const { accessToken, refreshToken, user } = createAuthSession(authUser);
   return {
-    user: jwtPayload,
+    user,
     accessToken,
     refreshToken,
   };
 };
-
 
 const refreshToken = async (refreshToken: string) => {
   const verifiedRefreshToken = jwtUtils.verifyToken(
@@ -189,12 +199,12 @@ const refreshToken = async (refreshToken: string) => {
     );
   }
   const { id } = verifiedRefreshToken.data as JwtPayload;
-  const user = await prisma.user.findUniqueOrThrow({
+  const authUser = await prisma.user.findUniqueOrThrow({
     where: {
       id,
     },
   });
-  if (user.status === "INACTIVE") {
+  if (authUser.status === "INACTIVE") {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
       "Unauthorized",
@@ -202,18 +212,7 @@ const refreshToken = async (refreshToken: string) => {
     );
   }
 
-  const jwtPayload = {
-    id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-  };
-
-  const accessToken = jwtUtils.createToken(
-    jwtPayload,
-    config.jwtAccessSecret,
-    config.jwtAccessExpiresIn as SignOptions,
-  );
+  const { accessToken } = createAuthSession(authUser);
 
   return { accessToken };
 };
