@@ -34,6 +34,17 @@ const getPropertyList = tryCatchAsync(
     });
   },
 );
+const getAllPropertyList = tryCatchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const properties = await propertyService.getAllPropertyListDB();
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "All properties retrieved successfully",
+      data: properties,
+    });
+  },
+);
 
 const getPropertyDetail = tryCatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -112,6 +123,7 @@ const deleteProperty = tryCatchAsync(
 
 export const propertyController = {
   getPropertyList,
+  getAllPropertyList,
   getPropertyDetail,
   getMyPropertyList,
   createProperty,

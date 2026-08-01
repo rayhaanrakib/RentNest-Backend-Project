@@ -97,6 +97,22 @@ const getPropertyListDB = async (query: IPropertyListQuery) => {
     properties: result,
   };
 };
+const getAllPropertyListDB = async () => {
+  return await prisma.property.findMany({
+    where: {
+      status: PropertyStatus.AVAILABLE,
+    },
+    select: {
+      id: true,
+      title: true,
+      category: {
+        select: {
+          id: true
+        },
+      },
+    },
+  });
+};
 
 const getPropertyDetailDB = async (propertyId: string) => {
   const propertyExist = await prisma.property.findUnique({
@@ -276,6 +292,7 @@ const deletePropertyDB = async (propertyId: string, userId: string) => {
 
 export const propertyService = {
   getPropertyListDB,
+  getAllPropertyListDB,
   getPropertyDetailDB,
   getMyPropertyListDB,
   createPropertyDB,

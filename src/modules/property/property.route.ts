@@ -6,6 +6,7 @@ import { propertyController } from "./property.controller";
 const router = Router()
 
 router.get("/", propertyController.getPropertyList);
+router.get("/all", propertyController.getAllPropertyList);
 router.get("/my-property",auth(UserRole.LANDLORD), propertyController.getMyPropertyList);
 router.get("/:id", propertyController.getPropertyDetail);
 
