@@ -105,6 +105,7 @@ const getAllPropertyListDB = async () => {
     select: {
       id: true,
       title: true,
+      city: true,
       category: {
         select: {
           id: true
