@@ -85,8 +85,8 @@ const createCheckoutSession = async (
         mode: "payment",
         customer_email: rentalRequest.tenant.email,
         payment_method_types: ["card"],
-        success_url: `${config.appUrl}/payments/checkout/success`,
-        cancel_url: `${config.appUrl}/payments/checkout/cancel`,
+        success_url: `${config.appUrl}/payments/success`,
+        cancel_url: `${config.appUrl}/payments/cancel`,
         metadata: {
           rentalRequestId,
           tenantId,
