@@ -52,7 +52,7 @@ const createRentalRequestDB = async (
       "You cannot rent your own property",
     );
   }
-  
+
   const existingRequest = await prisma.rentalRequest.findFirst({
     where: {
       tenantId: userId,
@@ -93,6 +93,12 @@ const getTenantRentalRequestsDB = async (userId: string) => {
       status: RentalStatus.PENDING,
     },
   });
+  const total_active_requests = await prisma.rentalRequest.count({
+    where: {
+      tenantId: userId,
+      status: RentalStatus.ACTIVE,
+    },
+  });
   const total_approved_requests = await prisma.rentalRequest.count({
     where: {
       tenantId: userId,
@@ -105,6 +111,7 @@ const getTenantRentalRequestsDB = async (userId: string) => {
       status: RentalStatus.REJECTED,
     },
   });
+
   const requests = await prisma.rentalRequest.findMany({
     where: {
       tenantId: userId,
@@ -114,6 +121,7 @@ const getTenantRentalRequestsDB = async (userId: string) => {
   return {
     total_requests,
     total_pending_requests,
+    total_active_requests,
     total_approved_requests,
     total_rejected_requests,
     requests,
