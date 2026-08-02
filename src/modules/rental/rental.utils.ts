@@ -24,6 +24,12 @@ export const CREATE_REQUEST = {
 };
 
 export const ALL_RENTAL_REQUESTS = {
+  id: true,
+  moveInDate: true,
+  duration: true,
+  message: true,
+  createdAt: true,
+  updatedAt: true,
   status: true,
   property: {
     select: {
