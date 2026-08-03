@@ -116,30 +116,6 @@ export const validateUpdateProperty = (
     );
   }
 
-  if (payload.bedrooms !== undefined && payload.bedrooms <= 0) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Validation failed",
-      "Bedrooms must be greater than 0",
-    );
-  }
-
-  if (payload.bathrooms !== undefined && payload.bathrooms <= 0) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Validation failed",
-      "Bathrooms must be greater than 0",
-    );
-  }
-
-  if (payload.area !== undefined && payload.area <= 0) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Validation failed",
-      "Area must be greater than 0",
-    );
-  }
-
   if (
     payload.status &&
     !Object.values(PropertyStatus).includes(payload.status)
