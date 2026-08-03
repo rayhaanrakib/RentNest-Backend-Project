@@ -127,14 +127,3 @@ export const validateUpdateProperty = (
     );
   }
 };
-
-export const validateUpdatePropertyStatus = (
-  payload: IUpdatePropertyStatusPayload) => {
-  if (!payload.status) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Validation failed",
-      "Property status is required",
-    );
-  }
-};
