@@ -184,7 +184,9 @@ const getLandlordAllRequestsDB = async (userId: string) => {
       property: {
         landlordId: userId,
       },
-      status: RentalStatus.APPROVED,
+      status: {
+        in: [RentalStatus.APPROVED, RentalStatus.ACTIVE],
+      },
     },
   });
   const total_rejected_requests = await prisma.rentalRequest.count({
