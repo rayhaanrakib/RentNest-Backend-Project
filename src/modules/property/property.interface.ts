@@ -38,8 +38,10 @@ export interface IUpdatePropertyPayload {
   status?: PropertyStatus;
   categoryId?: string;
 }
-export interface IUpdatePropertyStatusPayload{
-    status?: PropertyStatus;
+
+export type IUpdatePropertyStatus = "AVAILABLE" | "UNAVAILABLE";
+export interface IUpdatePropertyStatusPayload {
+  status?: IUpdatePropertyStatus;
 }
 
 export interface IPropertyListQuery {

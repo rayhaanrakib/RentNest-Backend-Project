@@ -129,8 +129,7 @@ export const validateUpdateProperty = (
 };
 
 export const validateUpdatePropertyStatus = (
-  payload: IUpdatePropertyStatusPayload,
-): void => {
+  payload: IUpdatePropertyStatusPayload) => {
   if (!payload.status) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
