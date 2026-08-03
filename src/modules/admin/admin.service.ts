@@ -77,7 +77,49 @@ const getAllUsersByFilterDB = async (query: IUserListByFilterQuery) => {
     users,
   };
 };
+const getSpecificUserDetailDB = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      avatar: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+      _count: {
+        select: {
+          properties: true,
+          rentals: true,
+          reviews: true,
+        },
+      },
+    },
+  });
 
+  if (!user) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Not Found",
+      "User not found."
+    );
+  }
+
+  if (user.role === UserRole.ADMIN) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Bad Request",
+      "Admin details cannot be retrieved."
+    );
+  }
+
+  return user;
+};
 const getAllUsersDB = async () => {
   const total_users = await prisma.user.count({
     where: {
@@ -256,5 +298,6 @@ export const adminService = {
   getStatsDB,
   getAllUsersDB,
   getAllUsersByFilterDB,
+  getSpecificUserDetailDB,
   updateUserStatusDB,
 };

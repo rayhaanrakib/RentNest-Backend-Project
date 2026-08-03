@@ -7,6 +7,7 @@ const router = Router()
 
 router.get("/users/all", auth(UserRole.ADMIN), adminController.getAllUsers);
 router.get("/users", auth(UserRole.ADMIN), adminController.getAllUsersByFilter);
+router.get("/users/:id", auth(UserRole.ADMIN), adminController.getSpecificUserDetail);
 router.patch("/users/:id", auth(UserRole.ADMIN), adminController.updateUserStatus);
 
 router.get("/profile", auth(UserRole.ADMIN), adminController.getProfile);
