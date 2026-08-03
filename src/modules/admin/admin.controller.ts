@@ -22,9 +22,9 @@ const getAllUsersByFilter = tryCatchAsync(
 );
 const getSpecificUserDetail = tryCatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { userId } = req.params;
+    const { id } = req.params;
 
-    const user = await adminService.getSpecificUserDetailDB(userId as string);
+    const user = await adminService.getSpecificUserDetailDB(id as string);
 
     sendResponse(res, {
       success: true,

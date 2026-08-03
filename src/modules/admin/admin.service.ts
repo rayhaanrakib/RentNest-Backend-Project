@@ -78,10 +78,8 @@ const getAllUsersByFilterDB = async (query: IUserListByFilterQuery) => {
   };
 };
 const getSpecificUserDetailDB = async (userId: string) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
     select: {
       id: true,
       name: true,
@@ -101,22 +99,6 @@ const getSpecificUserDetailDB = async (userId: string) => {
       },
     },
   });
-
-  if (!user) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      "Not Found",
-      "User not found."
-    );
-  }
-
-  if (user.role === UserRole.ADMIN) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Bad Request",
-      "Admin details cannot be retrieved."
-    );
-  }
 
   return user;
 };
