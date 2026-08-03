@@ -1,5 +1,3 @@
-import httpStatus from "http-status-codes";
-import { PropertyStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import {
@@ -8,18 +6,21 @@ import {
   IUpdatePropertyPayload,
   IUpdatePropertyStatusPayload,
 } from "./property.interface";
+import httpStatus from "http-status-codes";
 import {
-  ALL_PROPERTY_SELECT,
-  BUILD_PROPERTY_CLAUSE,
-  BUILD_PROPERTY_ORDER_BY_CLAUSE,
   CREATE_PROPERTY_SELECT,
+  ALL_PROPERTY_SELECT,
   SPECIFIC_PROPERTY_SELECT,
   UPDATE_PROPERTY_SELECT,
+  BUILD_PROPERTY_CLAUSE,
+  BUILD_PROPERTY_ORDER_BY_CLAUSE,
 } from "./property.utils";
 import {
   validateCreateProperty,
-  validateUpdateProperty
+  validateUpdateProperty,
+  validateUpdatePropertyStatus,
 } from "./property.validation";
+import { PropertyStatus } from "../../../generated/prisma/enums";
 
 const createPropertyDB = async (
   payload: ICreatePropertyPayload,
@@ -190,6 +191,9 @@ const getMyPropertyListDB = async (userId: string) => {
   };
 };
 const updatePropertyStatusDB = async (propertyId: string, userId: string, payload: IUpdatePropertyStatusPayload) =>{
+    validateUpdatePropertyStatus({
+      ...payload,
+    });
     const propertyExist = await prisma.property.findUnique({
       where: {
         id: propertyId,
