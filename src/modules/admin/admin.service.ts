@@ -1,12 +1,12 @@
+import httpStatus from "http-status-codes";
 import { Prisma } from "../../../generated/prisma/client";
 import { UserRole, UserStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import {
   IUpdateUserStatusPayload,
-  IUserListByRoleQuery,
+  IUserListByFilterQuery
 } from "./admin.interface";
-import httpStatus from "http-status-codes";
 
 const validateUpdateUserStatus = (payload: IUpdateUserStatusPayload) => {
   if (!payload.status) {
@@ -18,12 +18,7 @@ const validateUpdateUserStatus = (payload: IUpdateUserStatusPayload) => {
   }
 };
 
-const getAllUsersByRoleDB = async (query: IUserListByRoleQuery) => {
-  const where: Prisma.UserWhereInput = {
-    role: {
-      not: UserRole.ADMIN,
-    },
-  };
+const getAllUsersByFilterDB = async (query: IUserListByFilterQuery) => {
   if (query.role === UserRole.ADMIN) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -31,24 +26,27 @@ const getAllUsersByRoleDB = async (query: IUserListByRoleQuery) => {
       "Admin cannot be retrieved.",
     );
   }
-  let total = 0;
-  if (query.role === UserRole.LANDLORD) {
-    where.role = UserRole.LANDLORD;
 
-    total = await prisma.user.count({
-      where: {
-        role: UserRole.LANDLORD,
-      },
-    });
-  } else if (query.role === UserRole.TENANT) {
-    where.role = UserRole.TENANT;
+  const where: Prisma.UserWhereInput = {
+    role: {
+      not: UserRole.ADMIN,
+    },
+  };
 
-    total = await prisma.user.count({
-      where: {
-        role: UserRole.TENANT,
-      },
-    });
+  // Role filter
+  if (query.role) {
+    where.role = query.role;
   }
+
+  // Status filter
+  if (query.status) {
+    where.status = query.status;
+  }
+
+  const total = await prisma.user.count({
+    where,
+  });
+
   const users = await prisma.user.findMany({
     where,
     orderBy: {
@@ -257,6 +255,6 @@ export const adminService = {
   getProfileDB,
   getStatsDB,
   getAllUsersDB,
-  getAllUsersByRoleDB,
+  getAllUsersByFilterDB,
   updateUserStatusDB,
 };

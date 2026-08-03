@@ -7,3 +7,8 @@ export interface IUpdateUserStatusPayload {
 export interface IUserListByRoleQuery {
   role?: UserRole;
 }
+
+export interface IUserListByFilterQuery{
+  status?: UserStatus;
+  role?: UserRole;
+}

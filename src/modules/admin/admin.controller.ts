@@ -5,13 +5,13 @@ import httpStatus from "http-status";
 import { adminService } from "./admin.service";
 import {
   IUpdateUserStatusPayload,
-  IUserListByRoleQuery,
+  IUserListByFilterQuery,
 } from "./admin.interface";
 
-const getAllUsersByRole = tryCatchAsync(
+const getAllUsersByFilter = tryCatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const query = req.query as IUserListByRoleQuery;
-    const users = await adminService.getAllUsersByRoleDB(query);
+    const query = req.query as IUserListByFilterQuery;
+    const users = await adminService.getAllUsersByFilterDB(query);
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
@@ -72,9 +72,9 @@ const getProfile = tryCatchAsync(
 );
 
 export const adminController = {
-    getStats,
-    getProfile,
-  getAllUsersByRole,
+  getStats,
+  getProfile,
+  getAllUsersByFilter,
   getAllUsers,
   updateUserStatus,
 };
