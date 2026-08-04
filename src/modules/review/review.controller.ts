@@ -21,4 +21,18 @@ const createReview = tryCatchAsync(
   },
 );
 
-export const reviewController = { createReview };
+const getTenantRentalReview = tryCatchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const tenantId = req.user!.id;
+    const rentalReviews =
+      await reviewService.getTenantRentalReviewsDB(tenantId);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Rental reviews retrieved successfully",
+      data: rentalReviews,
+    });
+  },
+);
+
+export const reviewController = { createReview, getTenantRentalReview };

@@ -94,6 +94,31 @@ const createReviewDB = async (data: ICreateReviewPayload, tenantId: string) => {
   return review;
 };
 
+const getTenantRentalReviewsDB = async (tenantId: string) => {
+  const reviews = await prisma.review.findMany({
+    where: { tenantId },
+    select: {
+      id: true,
+      rating: true,
+      comment: true,
+      createdAt: true,
+      property: {
+        select: {
+          id: true,
+          title: true,
+          images: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return reviews;
+};
+
 export const reviewService = {
-  createReviewDB
+  createReviewDB,
+  getTenantRentalReviewsDB
 }
