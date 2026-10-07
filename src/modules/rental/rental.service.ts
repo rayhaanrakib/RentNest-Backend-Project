@@ -57,14 +57,14 @@ const createRentalRequestDB = async (
     where: {
       tenantId: userId,
       propertyId: payload.propertyId,
-      status: RentalStatus.PENDING,
+      status: RentalStatus.APPROVED,
     },
   });
   if (existingRequest) {
     throw new AppError(
       httpStatus.CONFLICT,
       "Conflict",
-      "You already have a pending rental request for this property",
+      "You already have a active rental request for this property",
     );
   }
 
