@@ -1,16 +1,11 @@
 {
   "version": 2,
   "buildCommand": "bun run build",
-  "builds": [
+  "outputDirectory": "dist",
+  "rewrites": [
     {
-      "src": "dist/server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "dist/server.js"
+      "source": "/(.*)",
+      "destination": "/server.js"
     }
   ]
 }
