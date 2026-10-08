@@ -4,8 +4,7 @@
   "description": "RentNest is a backend API for a rental marketplace",
   "author": "Rayhan",
   "license": "ISC",
-  "module": "index.ts",
-  "main": "server.ts",
+  "main": "dist/server.js",
   "type": "module",
   "scripts": {
     "start": "node dist/server.js",
